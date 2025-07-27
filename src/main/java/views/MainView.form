@@ -17,24 +17,6 @@
         </properties>
         <border type="none"/>
         <children>
-          <component id="4a04f" class="javax.swing.JButton" binding="btnEnd">
-            <constraints>
-              <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <font style="1"/>
-              <text value="Marcar fin"/>
-            </properties>
-          </component>
-          <component id="b12a" class="javax.swing.JButton" binding="btnWall">
-            <constraints>
-              <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <font style="1"/>
-              <text value="Pared"/>
-            </properties>
-          </component>
           <hspacer id="75b79">
             <constraints>
               <grid row="1" column="4" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -59,13 +41,31 @@
               <text value="Label"/>
             </properties>
           </component>
-          <component id="616d5" class="javax.swing.JButton" binding="btnStart">
+          <component id="ee21a" class="javax.swing.JToggleButton" binding="btnStart">
             <constraints>
-              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <font style="1"/>
-              <text value="Marcar inicio"/>
+              <text value="Inicio"/>
+            </properties>
+          </component>
+          <component id="62a18" class="javax.swing.JToggleButton" binding="btnEnd">
+            <constraints>
+              <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <font style="1"/>
+              <text value="Marcar final"/>
+            </properties>
+          </component>
+          <component id="1680f" class="javax.swing.JToggleButton" binding="btnWall">
+            <constraints>
+              <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <font style="1"/>
+              <text value="Pared"/>
             </properties>
           </component>
         </children>
