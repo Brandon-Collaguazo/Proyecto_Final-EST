@@ -25,9 +25,9 @@ public class MazeSolverRecursivo implements MazeSolver {
     }
 
     private boolean findPath(Cell[][] grid, Cell current, Cell end, List<Cell> path, Set<Cell> visited) {
-        if (current.fila < 0 || current.fila >= grid.length ||
-            current.columna < 0 || current.columna >= grid[0].length ||
-            grid[current.fila][current.columna].getEstado() == CellState.MURO ||
+        if (current.row < 0 || current.row >= grid.length ||
+            current.col < 0 || current.col >= grid[0].length ||
+            grid[current.row][current.col].getState() == CellState.WALL ||
             visited.contains(current)) {
             return false;
         }
@@ -38,8 +38,8 @@ public class MazeSolverRecursivo implements MazeSolver {
             return true;
         }
 
-        if (findPath(grid, new Cell(current.fila, current.columna + 1, current.getEstado(), false), end, path, visited) ||
-            findPath(grid, new Cell(current.fila + 1, current.columna, current.getEstado(), false), end, path, visited)) {
+        if (findPath(grid, new Cell(current.row, current.col + 1, current.getState(), false), end, path, visited) ||
+            findPath(grid, new Cell(current.row + 1, current.col, current.getState(), false), end, path, visited)) {
             return true;
         }
 

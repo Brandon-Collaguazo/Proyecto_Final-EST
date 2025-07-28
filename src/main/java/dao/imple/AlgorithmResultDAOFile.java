@@ -23,7 +23,7 @@ public class AlgorithmResultDAOFile implements AlgorithmResultDAO {
 
         for( int i = 0;i<exist.size();i++){
             AlgorithmResult resultadoAux=exist.get(i);
-            if(resultadoAux.getNombreAlgoritmo().equalsIgnoreCase(resultado.getNombreAlgoritmo())){
+            if(resultadoAux.getNameAlgorithm().equalsIgnoreCase(resultado.getNameAlgorithm())){
                 exist.set(i,resultado);
                 actualizado= true;
                 break;

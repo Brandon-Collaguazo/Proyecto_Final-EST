@@ -36,14 +36,14 @@ public class MazeSolverDFS implements MazeSolver {
     }
 
     private boolean dfs(Cell current) {
-        if (current.fila < 0 || current.fila >= grid.length ||
-                current.columna < 0 || current.columna >= grid[0].length) {
+        if (current.row < 0 || current.row >= grid.length ||
+                current.col < 0 || current.col >= grid[0].length) {
             return false;
         }
 
-        Cell gridCell = grid[current.fila][current.columna];
+        Cell gridCell = grid[current.row][current.col];
 
-        if (gridCell.getEstado() == CellState.MURO ||
+        if (gridCell.getState() == CellState.WALL ||
                 visited.contains(gridCell)) {
             return false;
         }
@@ -57,8 +57,8 @@ public class MazeSolverDFS implements MazeSolver {
 
         int[][] directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
         for (int[] dir : directions) {
-            int newRow = gridCell.fila + dir[0];
-            int newCol = gridCell.columna + dir[1];
+            int newRow = gridCell.row + dir[0];
+            int newCol = gridCell.col + dir[1];
             Cell neighbor = grid[newRow][newCol];
             if (dfs(neighbor)) {
                 return true;

@@ -40,8 +40,8 @@ public class MazeSolverBFS implements MazeSolver {
 
             int[][] directions = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
             for (int[] dir : directions) {
-                int newRow = current.fila + dir[0];
-                int newCol = current.columna + dir[1];
+                int newRow = current.row + dir[0];
+                int newCol = current.col + dir[1];
 
                 if (newRow < 0 || newRow >= grid.length ||
                         newCol < 0 || newCol >= grid[0].length) {
@@ -50,7 +50,7 @@ public class MazeSolverBFS implements MazeSolver {
 
                 Cell neighbor = grid[newRow][newCol];
 
-                if (neighbor.getEstado() != CellState.MURO && !visited.contains(neighbor)) {
+                if (neighbor.getState() != CellState.WALL && !visited.contains(neighbor)) {
                     visited.add(neighbor);
                     parentMap.put(neighbor, current);
                     queue.add(neighbor);

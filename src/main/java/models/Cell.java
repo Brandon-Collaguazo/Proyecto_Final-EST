@@ -1,69 +1,70 @@
 package models;
 
 public class Cell {
-    public int fila;
-    public int columna;
-    private CellState estado;
-    private boolean visitado;
+    public int row;
+    public int col;
+    private CellState state;
+    private boolean visited;
 
-    public Cell(int fila, int columna, CellState estado, boolean visitado) {
-        this.fila = fila;
-        this.columna = columna;
-        this.estado = estado;
-        this.visitado = visitado;
+    public Cell(int row, int col, CellState state, boolean visited) {
+        this.row = row;
+        this.col = col;
+        this.state = state;
+        this.visited = visited;
     }
 
-    public int getFila() {
-        return fila;
+    public int getRow() {
+        return row;
     }
 
-    public void setFila(int fila) {
-        this.fila = fila;
+    public void setRow(int row) {
+        this.row = row;
     }
 
-    public int getColumna() {
-        return columna;
+    public int getCol() {
+        return col;
     }
 
-    public void setColumna(int columna) {
-        this.columna = columna;
+    public void setCol(int col) {
+        this.col = col;
     }
 
-    public CellState getEstado() {
-        return estado;
+    public CellState getState() {
+        return state;
     }
 
-    public void setEstado(CellState estado) {
-        this.estado = estado;
+    public void setState(CellState state) {
+        this.state = state;
     }
 
-    public boolean isVisitado() {
-        return visitado;
+    public boolean isVisited() {
+        return visited;
     }
 
-    public void setVisitado(boolean visitado) {
-        this.visitado = visitado;
+    public void setVisited(boolean visited) {
+        this.visited = visited;
     }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         Cell other = (Cell) obj;
-        return fila == other.fila && columna == other.columna;
+        return row == other.row && col == other.col;
     }
 
     @Override
     public int hashCode() {
-        return 31 * fila + columna;
+        return 31 * row + col;
     }
 
     @Override
     public String toString() {
         return "Cell{" +
-                "fila=" + fila +
-                ", columna=" + columna +
-                ", estado=" + estado +
-                ", visitado=" + visitado +
+                "row=" + row +
+                ", col=" + col +
+                ", state=" + state +
+                ", visited=" + visited +
                 '}';
     }
 }

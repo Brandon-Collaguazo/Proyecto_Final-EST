@@ -1,7 +1,7 @@
 package controllers;
 
-import dao.AlgorithmResultadoDAO;
-import models.AlgorithmResultado;
+import dao.AlgorithmResultDAO;
+import models.AlgorithmResult;
 import models.Cell;
 import models.CellState;
 import solver.MazeSolver;
@@ -15,15 +15,15 @@ import java.util.List;
 
 public class MazeController {
 
-    private MazePanel mazePanel;
-    private AlgorithmResultadoDAO dao;
+    private final MazePanel mazePanel;
+    private final AlgorithmResultDAO dao;
 
-    public MazeController(MazePanel mazePanel, AlgorithmResultadoDAO dao) {
+    public MazeController(MazePanel mazePanel, AlgorithmResultDAO dao) {
         this.mazePanel = mazePanel;
         this.dao = dao;
     }
 
-    public void resolverLaberinto(String tipoAlgoritmo) {
+    public void solverMaze(String tipoAlgoritmo) {
         Cell[][] laberinto = mazePanel.getMaze();
         Cell inicio = mazePanel.getStartCell();  // Corregido: getStartCell()
         Cell fin = mazePanel.getEndCell();
@@ -53,7 +53,7 @@ public class MazeController {
         long duracionMs = (tiempoFin - tiempoInicio) / 1_000_000;
         int pasos = solver.getSteps();
 
-        AlgorithmResultado resultado = new AlgorithmResultado(tipoAlgoritmo, pasos, duracionMs);
+        AlgorithmResult resultado = new AlgorithmResult(tipoAlgoritmo, pasos, duracionMs);
         dao.guardarResultado(resultado);
         mazePanel.repaint();
 
@@ -65,7 +65,7 @@ public class MazeController {
     }
 
     public void mostrarResultados() {
-        List<AlgorithmResultado> list = dao.obtenerTodos();
+        List<AlgorithmResult> list = dao.obtenerTodos();
         ResultadosDialog dialog = new ResultadosDialog(list);
         dialog.setVisible(true);
     }
@@ -89,8 +89,8 @@ public class MazeController {
     private void limpiarCeldas(Cell[][] laberinto) {
         for (Cell[] fila : laberinto) {
             for (Cell celda : fila) {
-                if (celda.getEstado() == CellState.VISITADO || celda.getEstado() == CellState.CAMINO) {
-                    celda.setEstado(CellState.LIBRE);
+                if (celda.getEstado() == CellState.VISITED || celda.getEstado() == CellState.PATH) {
+                    celda.setEstado(CellState.FREE);
                     celda.setVisitado(false);
                 }
             }

@@ -167,7 +167,7 @@ public class MazeFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String itemSelected = (String) cbxAlgoritmo.getSelectedItem();
                 if (itemSelected != null) {
-                    mazeController.resolverLaberinto(itemSelected);
+                    mazeController.solverMaze(itemSelected);
                 }
             }
         });

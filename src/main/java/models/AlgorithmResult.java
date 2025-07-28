@@ -1,43 +1,42 @@
 package models;
 
 public class AlgorithmResult {
-    private String nombreAlgoritmo;;
-    private int pasos;
-    private long tiempoMs;
+    private String nameAlgorithm;;
+    private int steps;
+    private long timeMs;
 
-    public AlgorithmResult(String nombreAlgoritmo, int pasos, long tiempoMs) {
-        this.nombreAlgoritmo = nombreAlgoritmo;
-        this.pasos = pasos;
-        this.tiempoMs = tiempoMs;
+    public AlgorithmResult(String nameAlgorithm, int steps, long timeMs) {
+        this.nameAlgorithm = nameAlgorithm;
+        this.steps = steps;
+        this.timeMs = timeMs;
     }
 
-    public String getNombreAlgoritmo() {
-        return nombreAlgoritmo;
+    public String getNameAlgorithm() {
+        return nameAlgorithm;
     }
 
-    public void setNombreAlgoritmo(String nombreAlgoritmo) {
-        this.nombreAlgoritmo = nombreAlgoritmo;
+    public void setNameAlgorithm(String nameAlgorithm) {
+        this.nameAlgorithm = nameAlgorithm;
     }
 
-    public int getPasos() {
-        return pasos;
+    public int getSteps() {
+        return steps;
     }
 
-    public void setPasos(int pasos) {
-        this.pasos = pasos;
+    public void setSteps(int steps) {
+        this.steps = steps;
     }
 
-    public long getTiempoMs() {
-        return tiempoMs;
+    public long getTimeMs() {
+        return timeMs;
     }
 
-    public void setTiempoMs(long tiempoMs) {
-        this.tiempoMs = tiempoMs;
-
+    public void setTimeMs(long timeMs) {
+        this.timeMs = timeMs;
     }
 
     @Override
     public String toString() {
-        return nombreAlgoritmo + "," + pasos + "," + tiempoMs;
+        return nameAlgorithm + "," + steps + "," + timeMs;
     }
 }

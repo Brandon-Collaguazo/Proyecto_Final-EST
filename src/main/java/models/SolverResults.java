@@ -1,25 +1,31 @@
 package models;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class SolverResults {
-    private List<AlgorithmResultado> resultados;
 
-    private SolverResults(){
-        resultados = new ArrayList<>();
+    private List<Cell> path;
+    private Set<Cell> visited;
+
+    public SolverResults(List<Cell> path, Set<Cell> visited) {
+        this.path = path;
+        this.visited = visited;
     }
 
-    public void agregarResultados( AlgorithmResultado resultado){
-        for(int i = 0; i<resultados.size();i++){
-            if(resultados.get(i).getNombreAlgoritmo().equalsIgnoreCase(resultado.getNombreAlgoritmo())){
-                resultados.set(i,resultado);
-                return;
-            }
-        }
-        resultados.add(resultado);
+    public List<Cell> getPath() {
+        return path;
     }
-    public List<AlgorithmResultado> getResultados() {
-        return resultados;
+
+    public void setPath(List<Cell> path) {
+        this.path = path;
+    }
+
+    public Set<Cell> getVisited() {
+        return visited;
+    }
+
+    public void setVisited(Set<Cell> visited) {
+        this.visited = visited;
     }
 }

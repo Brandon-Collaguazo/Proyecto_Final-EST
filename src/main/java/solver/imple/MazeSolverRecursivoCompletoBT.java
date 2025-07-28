@@ -52,10 +52,10 @@ public class MazeSolverRecursivoCompletoBT implements MazeSolver {
             return true;
         }
 
-        if (findPath(grid[current.fila][current.columna + 1]) ||
-                findPath(grid[current.fila + 1][current.columna]) ||
-                findPath(grid[current.fila][current.columna - 1]) ||
-                findPath(grid[current.fila - 1][current.columna])) {
+        if (findPath(grid[current.row][current.col + 1]) ||
+                findPath(grid[current.row + 1][current.col]) ||
+                findPath(grid[current.row][current.col - 1]) ||
+                findPath(grid[current.row - 1][current.col])) {
             return true;
         }
 
@@ -65,13 +65,13 @@ public class MazeSolverRecursivoCompletoBT implements MazeSolver {
 
     private boolean isValid(Cell current) {
         return current != null &&
-                current.getEstado() != CellState.MURO &&
+                current.getState() != CellState.WALL &&
                 !visited.contains(current);
     }
 
     private boolean isInMaze(Cell current) {
-        int fila = current.fila;
-        int columna = current.columna;
+        int fila = current.row;
+        int columna = current.col;
         return fila >= 0 && fila < grid.length && columna >= 0 && columna < grid[0].length;
     }
 }

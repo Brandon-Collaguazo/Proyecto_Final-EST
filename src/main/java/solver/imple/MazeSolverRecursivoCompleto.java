@@ -29,11 +29,11 @@ public class MazeSolverRecursivoCompleto implements MazeSolver {
     }
 
     private boolean  findPath(Cell[][] grid, Cell current, Cell end, List<Cell> path, Set<Cell> visited) {
-        int row = current.fila;
-        int col = current.columna;
+        int row = current.row;
+        int col = current.col;
 
         if (row < 0 || row >= grid.length || col < 0 || col >= grid[0].length ||
-            grid[row][col].getEstado() == CellState.MURO || visited.contains(current)) {
+            grid[row][col].getState() == CellState.WALL || visited.contains(current)) {
             return false;
         }
 
