@@ -12,9 +12,7 @@ import views.ResultadosDialog;
 import javax.swing.*;
 import java.util.List;
 
-/**
- * Controlador principal que gestiona la lógica del laberinto y resultados.
- */
+
 public class MazeController {
 
     private MazePanel mazePanel;
