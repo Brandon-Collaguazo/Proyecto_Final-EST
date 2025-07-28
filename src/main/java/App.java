@@ -1,9 +1,8 @@
-import views.MainView;
-import views.ResultsView;
+import views.MazeFrame;
 
 public class App {
 
     public static void main(String[] args) {
-        MainView mainView = new MainView();
+        MazeFrame mainView = new MazeFrame();
     }
 }

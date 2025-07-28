@@ -1,11 +1,13 @@
 package views;
 
+import models.CellState;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class MainView extends JFrame {
+public class MazeFrame extends JFrame {
     private JMenuBar menuBar;
     private JMenu menuArchivo;
     private JMenu menuAyuda;
@@ -15,7 +17,7 @@ public class MainView extends JFrame {
 
     private JPanel pnlPrincipal;
     private JPanel pnlSup;
-    private JPanel pnlCen;
+    private MazePanel mazePanel;
     private JPanel pnlInf;
 
     private ButtonGroup buttonGroup;
@@ -28,11 +30,10 @@ public class MainView extends JFrame {
     private JButton btnStep;
     private JButton btnClean;
 
-    private JButton[][] gridCells;
     private int mazeRow;
     private int mazeCol;
 
-    public MainView() {
+    public MazeFrame() {
         inputDimensions();
         initComponents();
     }
@@ -86,6 +87,9 @@ public class MainView extends JFrame {
         itemResultados = new JMenuItem("Ver resultados");
         itemInfo = new JMenuItem("Acerca de");
 
+        mazePanel = new MazePanel(mazeRow, mazeCol);
+        pnlPrincipal.add(mazePanel, BorderLayout.CENTER);
+
         menuBar.add(menuArchivo);
         menuBar.add(menuAyuda);
 
@@ -94,13 +98,16 @@ public class MainView extends JFrame {
 
         menuAyuda.add(itemInfo);
 
+        pnlPrincipal.add(pnlSup, BorderLayout.NORTH);
+        pnlPrincipal.add(mazePanel, BorderLayout.CENTER);
+        pnlPrincipal.add(pnlInf, BorderLayout.SOUTH);
+
         buttonGroup = new ButtonGroup();
         buttonGroup.add(btnStart);
         buttonGroup.add(btnEnd);
         buttonGroup.add(btnWall);
 
         cargarCombo();
-        initMaze();
         configuraristeners();
 
         setJMenuBar(menuBar);
@@ -116,10 +123,36 @@ public class MainView extends JFrame {
         itemResultados.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ResultsView resultsView = new ResultsView(MainView.this);
+                ResultadosDialog resultsView = new ResultadosDialog(MazeFrame.this);
                 resultsView.setVisible(true);
             }
         });
+
+        JButton[][] cells = mazePanel.getGridCells();
+        for (int i = 0; i < mazeRow; i++) {
+            for (int j = 0; j < mazeCol; j++) {
+                JButton cell = cells[i][j];
+
+                cell.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if (!cell.getBackground().equals(CellState.MURO.getColor()) &&
+                        !cell.getBackground().equals(CellState.INICIO.getColor()) &&
+                        !cell.getBackground().equals(CellState.FIN.getColor()) &&
+                        !cell.getBackground().equals(CellState.LIBRE.getColor())) {
+                        }
+
+                        if (btnStart.getModel().isSelected()) {
+                            cell.setBackground(CellState.INICIO.getColor());
+                        } else if (btnEnd.getModel().isSelected()) {
+                            cell.setBackground(CellState.FIN.getColor());
+                        } else if (btnWall.getModel().isSelected()) {
+                            cell.setBackground(CellState.MURO.getColor());
+                        }
+                    }
+                });
+            }
+        }
     }
 
     private void cargarCombo() {
@@ -130,36 +163,6 @@ public class MainView extends JFrame {
         cbxAlgoritmo.addItem("BFS (Breadth-First Search)");
         cbxAlgoritmo.addItem("DFS (Depth-First Search)");
         cbxAlgoritmo.setSelectedIndex(0);
-    }
-
-    private void initMaze() {
-        pnlCen = new JPanel(new GridLayout(mazeRow, mazeCol));
-        gridCells = new JButton[mazeRow][mazeCol];
-        for (int i = 0; i < mazeRow; i++) {
-            for (int j = 0; j < mazeCol; j++) {
-                gridCells[i][j] = new JButton();
-                gridCells[i][j].setOpaque(true);
-                gridCells[i][j].setBackground(Color.white);
-                gridCells[i][j].setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
-                gridCells[i][j].setPreferredSize(new Dimension(40, 40));
-
-                gridCells[i][j].addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        JButton cell = (JButton) e.getSource();
-                        if (btnStart.getModel().isSelected()) {
-                            cell.setBackground(Color.ORANGE); //Color para el inicio
-                        } else if (btnEnd.getModel().isSelected()) {
-                            cell.setBackground(Color.RED); //Color para el fin
-                        } else if (btnWall.getModel().isSelected()) {
-                            cell.setBackground(cell.getBackground() == Color.BLACK ? Color.WHITE : Color.BLACK);//Color para la pared
-                        }
-                    }
-                });
-                pnlCen.add(gridCells[i][j]);
-            }
-        }
-        pnlPrincipal.add(pnlCen);
     }
 
     public JMenu getMenuArchivo() {
@@ -216,14 +219,6 @@ public class MainView extends JFrame {
 
     public void setPnlSup(JPanel pnlSup) {
         this.pnlSup = pnlSup;
-    }
-
-    public JPanel getPnlCen() {
-        return pnlCen;
-    }
-
-    public void setPnlCen(JPanel pnlCen) {
-        this.pnlCen = pnlCen;
     }
 
     public JPanel getPnlInf() {
@@ -296,14 +291,6 @@ public class MainView extends JFrame {
 
     public void setBtnClean(JButton btnClean) {
         this.btnClean = btnClean;
-    }
-
-    public JButton[][] getGridCells() {
-        return gridCells;
-    }
-
-    public void setGridCells(JButton[][] gridCells) {
-        this.gridCells = gridCells;
     }
 
     public int getMazeRow() {
