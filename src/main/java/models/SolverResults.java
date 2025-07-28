@@ -3,10 +3,10 @@ package models;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SolveResults {
+public class SolverResults {
     private List<AlgorithmResultado> resultados;
 
-    private SolveResults(){
+    private SolverResults(){
         resultados = new ArrayList<>();
     }
 

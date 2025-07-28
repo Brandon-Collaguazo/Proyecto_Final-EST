@@ -2,8 +2,6 @@ package views;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class MazePanel extends JPanel {
     private JButton[][] gridCells;
@@ -34,31 +32,12 @@ public class MazePanel extends JPanel {
         return gridCells;
     }
 
-    public void setGridCells(JButton[][] gridCells) {
-        this.gridCells = gridCells;
-    }
-
     public int getMazeRow() {
         return mazeRow;
-    }
-
-    public void setMazeRow(int mazeRow) {
-        this.mazeRow = mazeRow;
     }
 
     public int getMazeCol() {
         return mazeCol;
     }
 
-    public void setMazeCol(int mazeCol) {
-        this.mazeCol = mazeCol;
-    }
-
-    public void clearMaze() {
-        for (int i = 0; i < mazeRow; i++) {
-            for (int j = 0; j < mazeCol; j++) {
-                gridCells[i][j].setBackground(Color.WHITE);
-            }
-        }
-    }
 }

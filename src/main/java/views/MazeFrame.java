@@ -1,5 +1,7 @@
 package views;
 
+import controllers.MazeController;
+import dao.imple.AlgorithmResultDAOFile;
 import models.CellState;
 
 import javax.swing.*;
@@ -33,9 +35,13 @@ public class MazeFrame extends JFrame {
     private int mazeRow;
     private int mazeCol;
 
+    private MazeController mazeController;
+
     public MazeFrame() {
         inputDimensions();
         initComponents();
+        mazeController = new MazeController(mazePanel, new AlgorithmResultDAOFile("resultado.txt"));
+        configurarListenerControlador();
     }
 
     private void inputDimensions() {
@@ -153,6 +159,27 @@ public class MazeFrame extends JFrame {
                 });
             }
         }
+    }
+
+    private void configurarListenerControlador() {
+        btnSolve.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String itemSelected = (String) cbxAlgoritmo.getSelectedItem();
+                if (itemSelected != null) {
+                    mazeController.resolverLaberinto(itemSelected);
+                }
+            }
+        });
+
+        btnClean.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mazeController.clearMaze();
+            }
+        });
+
+        configuraristeners();
     }
 
     private void cargarCombo() {

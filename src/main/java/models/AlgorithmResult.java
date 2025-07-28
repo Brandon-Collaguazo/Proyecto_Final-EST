@@ -1,12 +1,11 @@
 package models;
 
-public class AlgorithmResultado {
-
+public class AlgorithmResult {
     private String nombreAlgoritmo;;
     private int pasos;
     private long tiempoMs;
 
-    public AlgorithmResultado(String nombreAlgoritmo, int pasos, long tiempoMs) {
+    public AlgorithmResult(String nombreAlgoritmo, int pasos, long tiempoMs) {
         this.nombreAlgoritmo = nombreAlgoritmo;
         this.pasos = pasos;
         this.tiempoMs = tiempoMs;
@@ -39,10 +38,6 @@ public class AlgorithmResultado {
 
     @Override
     public String toString() {
-        return "AlgorithmResultado{" +
-                "nombreAlgoritmo='" + nombreAlgoritmo + '\'' +
-                ", pasos=" + pasos +
-                ", tiempoMs=" + tiempoMs +
-                '}';
+        return nombreAlgoritmo + "," + pasos + "," + tiempoMs;
     }
 }

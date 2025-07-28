@@ -1,13 +1,12 @@
 package models;
 
 public class Cell {
-    private int fila;
-    private int columna;
+    public int fila;
+    public int columna;
     private CellState estado;
     private boolean visitado;
 
     public Cell(int fila, int columna, CellState estado, boolean visitado) {
-
         this.fila = fila;
         this.columna = columna;
         this.estado = estado;
