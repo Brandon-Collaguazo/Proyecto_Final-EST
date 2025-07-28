@@ -1,7 +1,10 @@
 package views;
 
+import models.AlgorithmResult;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.util.List;
 
 public class ResultadosDialog extends JDialog {
     private JPanel pnlPrincipal;
@@ -30,6 +33,23 @@ public class ResultadosDialog extends JDialog {
         modelo.setColumnIdentifiers(columnas);
         tblResults.setModel(modelo);
     }
+    public void cargarResultados(List<AlgorithmResult> resultados) {
+        if (tblResults == null || modelo == null) {
+            configurarTabla(); // asegúrate de que estén listos
+        }
+
+        modelo.setRowCount(0); // limpia filas anteriores
+
+        for (AlgorithmResult r : resultados) {
+            modelo.addRow(new Object[]{
+                    r.getNameAlgorithm(),
+                    r.getSteps(),
+                    r.getTimeMs()
+            });
+        }
+    }
+
+
 
     public JPanel getPnlPrincipal() {
         return pnlPrincipal;
