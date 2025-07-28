@@ -45,6 +45,18 @@ public class Cell {
     public void setVisitado(boolean visitado) {
         this.visitado = visitado;
     }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Cell other = (Cell) obj;
+        return fila == other.fila && columna == other.columna;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * fila + columna;
+    }
 
     @Override
     public String toString() {
