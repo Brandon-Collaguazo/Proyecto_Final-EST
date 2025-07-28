@@ -3,7 +3,7 @@ package views;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-public class ResultsView extends JDialog {
+public class ResultadosDialog extends JDialog {
     private JPanel pnlPrincipal;
     private JPanel pnlSup;
     private JPanel pnlInf;
@@ -12,7 +12,7 @@ public class ResultsView extends JDialog {
     private JButton btnGraph;
     private JButton btnClean;
 
-    public ResultsView(JFrame parent) {
+    public ResultadosDialog(JFrame parent) {
         super(parent, "Resultados de Ejecución", true);
         initComponents();
     }

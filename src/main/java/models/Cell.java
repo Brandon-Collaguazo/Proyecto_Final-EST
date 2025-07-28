@@ -3,10 +3,10 @@ package models;
 public class Cell {
     private int fila;
     private int columna;
-    private CellSate estado;
+    private CellState estado;
     private boolean visitado;
 
-    public Cell(int fila, int columna, CellSate estado, boolean visitado) {
+    public Cell(int fila, int columna, CellState estado, boolean visitado) {
 
         this.fila = fila;
         this.columna = columna;
@@ -30,11 +30,11 @@ public class Cell {
         this.columna = columna;
     }
 
-    public CellSate getEstado() {
+    public CellState getEstado() {
         return estado;
     }
 
-    public void setEstado(CellSate estado) {
+    public void setEstado(CellState estado) {
         this.estado = estado;
     }
 
