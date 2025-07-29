@@ -35,11 +35,9 @@ public class ResultadosDialog extends JDialog {
     }
     public void cargarResultados(List<AlgorithmResult> resultados) {
         if (tblResults == null || modelo == null) {
-            configurarTabla(); // asegúrate de que estén listos
+            configurarTabla();
         }
-
-        modelo.setRowCount(0); // limpia filas anteriores
-
+        modelo.setRowCount(0);
         for (AlgorithmResult r : resultados) {
             modelo.addRow(new Object[]{
                     r.getNameAlgorithm(),
@@ -48,8 +46,6 @@ public class ResultadosDialog extends JDialog {
             });
         }
     }
-
-
 
     public JPanel getPnlPrincipal() {
         return pnlPrincipal;

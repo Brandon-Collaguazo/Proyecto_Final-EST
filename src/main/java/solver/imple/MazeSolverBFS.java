@@ -19,18 +19,16 @@ public class MazeSolverBFS implements MazeSolver {
     public SolverResults solver(Cell[][] grid, Cell start, Cell end) {
         Set<Cell> visited = new LinkedHashSet<>();
         List<Cell> emptyPath = new ArrayList<>();
-
-        if (grid == null || grid.length == 0) {
+        if (grid == null || grid.length == 0 || start == null || end == null ||
+                start.getState() == CellState.WALL || end.getState() == CellState.WALL) {
             return new SolverResults(emptyPath, visited);
         }
 
         Queue<Cell> queue = new ArrayDeque<>();
         Map<Cell, Cell> parentMap = new HashMap<>();
-
         queue.add(start);
         visited.add(start);
         parentMap.put(start, null);
-
         while (!queue.isEmpty()) {
             Cell current = queue.poll();
 
@@ -43,11 +41,9 @@ public class MazeSolverBFS implements MazeSolver {
                 int newRow = current.row + dir[0];
                 int newCol = current.col + dir[1];
 
-                if (newRow < 0 || newRow >= grid.length ||
-                        newCol < 0 || newCol >= grid[0].length) {
+                if (newRow < 0 || newRow >= grid.length || newCol < 0 || newCol >= grid[0].length) {
                     continue;
                 }
-
                 Cell neighbor = grid[newRow][newCol];
 
                 if (neighbor.getState() != CellState.WALL && !visited.contains(neighbor)) {

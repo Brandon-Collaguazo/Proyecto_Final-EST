@@ -24,7 +24,8 @@ public class MazeSolverDFS implements MazeSolver {
         this.path = new ArrayList<>();
         this.visited = new LinkedHashSet<>();
 
-        if (grid == null || grid.length == 0 || start == null || end == null) {
+        if (grid == null || grid.length == 0 || start == null || end == null ||
+                start.getState() == CellState.WALL || end.getState() == CellState.WALL) {
             return new SolverResults(new ArrayList<>(), visited);
         }
 
@@ -43,8 +44,7 @@ public class MazeSolverDFS implements MazeSolver {
 
         Cell gridCell = grid[current.row][current.col];
 
-        if (gridCell.getState() == CellState.WALL ||
-                visited.contains(gridCell)) {
+        if (gridCell.getState() == CellState.WALL || visited.contains(gridCell)) {
             return false;
         }
 
@@ -59,6 +59,11 @@ public class MazeSolverDFS implements MazeSolver {
         for (int[] dir : directions) {
             int newRow = gridCell.row + dir[0];
             int newCol = gridCell.col + dir[1];
+
+            if (newRow < 0 || newRow >= grid.length || newCol < 0 || newCol >= grid[0].length) {
+                continue;
+            }
+
             Cell neighbor = grid[newRow][newCol];
             if (dfs(neighbor)) {
                 return true;

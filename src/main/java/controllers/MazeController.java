@@ -20,79 +20,69 @@ public class MazeController {
     private final MazePanel mazePanel;
     private final AlgorithmResultDAO dao;
 
-
     public MazeController(MazePanel mazePanel, AlgorithmResultDAO dao) {
         this.mazePanel = mazePanel;
         this.dao = dao;
     }
 
-
-    public void solverMaze(String tipoAlgoritmo) {
+    public AlgorithmResult solverMaze(String tipoAlgoritmo) {
         Cell[][] laberinto = mazePanel.getMaze();
         Cell inicio = mazePanel.getStartCell();
         Cell fin = mazePanel.getEndCell();
 
         if (inicio == null || fin == null) {
             JOptionPane.showMessageDialog(null, "Selecciona una celda de inicio y una de fin.");
-            return;
+            return null;
+        }
+
+        if (inicio.getState() == CellState.WALL || fin.getState() == CellState.WALL) {
+            JOptionPane.showMessageDialog(null, "Las celdas de inicio y fin no pueden ser paredes. Seleccione celdas transitables.");
+            return null;
         }
 
         MazeSolver solver = obtenerAlgoritmo(tipoAlgoritmo);
         if (solver == null) {
             JOptionPane.showMessageDialog(null, "Algoritmo no válido: " + tipoAlgoritmo);
-            return;
+            return null;
         }
 
         limpiarCeldas(laberinto);
-
-        long tiempoInicio = System.nanoTime();
-        SolverResults resultados = solver.solver(laberinto, inicio, fin);
-        long tiempoFin = System.nanoTime();
-
-        if (resultados.getPath().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "No se encontró ruta entre A y B.");
-            return;
-        }
-
-        marcarVisitados(resultados.getVisited());
-        marcarCamino(resultados.getPath());
-
-        long duracionMs = (tiempoFin - tiempoInicio) / 1_000_000;
-        int pasos = resultados.getPath().size();
-
-        AlgorithmResult resultado = new AlgorithmResult(tipoAlgoritmo, pasos, duracionMs);
-        dao.guardarResultado(resultado);
-
         mazePanel.repaint();
 
-        JOptionPane.showMessageDialog(null,
-                " Algoritmo: " + tipoAlgoritmo +
-                        "\n Pasos: " + pasos +
-                        "\n Tiempo: " + duracionMs + " ms");
+        long tiempoInicio = System.nanoTime();
+        SolverResults exito = solver.solver(laberinto, inicio, fin);
+        long tiempoFin = System.nanoTime();
+
+        if (exito.getPath() == null || exito.getPath().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "No se encontró ruta.", "Sin Ruta", JOptionPane.INFORMATION_MESSAGE);
+            mazePanel.repaint();
+            return null;
+        }
+
+        // Marcar celdas visitadas y el camino
+        marcarVisitados(exito.getVisited());
+        marcarCamino(exito.getPath());
+
+        long duracionMs = (tiempoFin - tiempoInicio) / 1_000_000;
+        int pasos = exito.getPath().size();
+
+        AlgorithmResult finalResult = new AlgorithmResult(tipoAlgoritmo, pasos, duracionMs);
+        dao.guardarResultado(finalResult);
+        mazePanel.repaint();
+        return finalResult;
     }
 
-
-    public void mostrarResultados() {
-        ResultadosDialog dialog = new ResultadosDialog(null); // o puedes pasar el JFrame si lo tienes
-        List<AlgorithmResult> resultados = dao.obtenerTodos();
-        dialog.cargarResultados(resultados); // usa el método que creaste
+    public void showResults() {
+        List<AlgorithmResult> results = dao.obtenerTodos();
+        ResultadosDialog dialog = new ResultadosDialog(null);
+        dialog.cargarResultados(results);
         dialog.setVisible(true);
     }
-
-
 
     public void limpiarResultados() {
         dao.eliminarTodos();
         JOptionPane.showMessageDialog(null, "Resultados eliminados con éxito.");
     }
-
-
-    public void clearMaze() {
-        mazePanel.clearMaze();
-    }
-
-
-
 
     private MazeSolver obtenerAlgoritmo(String tipoAlgoritmo) {
         return switch (tipoAlgoritmo) {
@@ -108,27 +98,38 @@ public class MazeController {
     private void limpiarCeldas(Cell[][] laberinto) {
         for (Cell[] fila : laberinto) {
             for (Cell celda : fila) {
+                // Solo limpiar celdas que fueron visitadas o parte de un camino
                 if (celda.getState() == CellState.VISITED || celda.getState() == CellState.PATH) {
                     celda.setState(CellState.EMPTY);
-                    celda.setVisited(false);
                 }
+                celda.setVisited(false);
             }
         }
     }
 
     private void marcarVisitados(Set<Cell> visitados) {
+        if (visitados == null) return;
         for (Cell celda : visitados) {
-            if (celda.getState() == CellState.EMPTY) {
-                celda.setState(CellState.VISITED);
+            if (celda.getState() != CellState.START && celda.getState() != CellState.END) {
+                mazePanel.updateCellState(celda.getRow(), celda.getCol(), CellState.VISITED);
             }
         }
     }
 
     private void marcarCamino(List<Cell> path) {
+        if (path == null) return;
         for (Cell celda : path) {
             if (celda.getState() == CellState.EMPTY || celda.getState() == CellState.VISITED) {
-                celda.setState(CellState.PATH);
+                mazePanel.updateCellState(celda.getRow(), celda.getCol(), CellState.PATH);
             }
+        }
+        Cell inicio = mazePanel.getStartCell();
+        if (inicio != null) {
+            mazePanel.updateCellState(inicio.getRow(), inicio.getCol(), CellState.START);
+        }
+        Cell fin = mazePanel.getEndCell();
+        if (fin != null) {
+            mazePanel.updateCellState(fin.getRow(), fin.getCol(), CellState.END);
         }
     }
 }

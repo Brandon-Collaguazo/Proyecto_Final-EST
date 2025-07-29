@@ -7,124 +7,77 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MazePanel extends JPanel {
+    private JButton[][] gridButtons;
+    private Cell[][] mazeCells;
+    private int mazeRow;
+    private int mazeCol;
 
-    private Cell[][] maze;
-    private int rows;
-    private int cols;
     private Cell startCell;
     private Cell endCell;
 
-    public MazePanel(int rows, int cols) {
-        this.rows = rows;
-        this.cols = cols;
-        this.maze = new Cell[rows][cols];
-        setLayout(new GridLayout(rows, cols));
-        inicializarMaze();
+    public MazePanel(int mazeRow, int mazeCol) {
+        this.mazeRow = mazeRow;
+        this.mazeCol = mazeCol;
+        setLayout(new GridLayout(mazeRow, mazeCol));
+        initGrid();
     }
 
-    private void inicializarMaze() {
-        removeAll();
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                maze[i][j] = new Cell(i, j, CellState.EMPTY, false);
-                JButton button = crearBotonCelda(i, j);
-                add(button);
+    private void initGrid() {
+        gridButtons = new JButton[mazeRow][mazeCol];
+        mazeCells = new Cell[mazeRow][mazeCol];
+
+        for (int i = 0; i < mazeRow; i++) {
+            for (int j = 0; j < mazeCol; j++) {
+                mazeCells[i][j] = new Cell(i, j, CellState.EMPTY, false);
+                gridButtons[i][j] = new JButton();
+                gridButtons[i][j].setOpaque(true);
+                gridButtons[i][j].setBackground(mazeCells[i][j].getColor());
+                gridButtons[i][j].setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+                add(gridButtons[i][j]);
             }
         }
-        revalidate();
-        repaint();
     }
 
-    private JButton crearBotonCelda(int row, int col) {
-        JButton button = new JButton();
-        button.setOpaque(true);
-        button.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        button.setBackground(obtenerColorEstado(maze[row][col].getState()));
-        button.addActionListener(e -> manejarClickCelda(row, col));
-        return button;
-    }
-
-    private void manejarClickCelda(int row, int col) {
-        Cell cell = maze[row][col];
-        CellState currentState = cell.getState();
-
-        if (currentState == CellState.EMPTY) {
-            if (startCell == null) {
-                cell.setState(CellState.START);
+    public void updateCellState(int row, int col, CellState newState) {
+        if (row >= 0 && row < mazeRow && col >= 0 && col < mazeCol) {
+            Cell cell = mazeCells[row][col];
+            CellState oldState = cell.getState();
+            if (newState == CellState.START) {
+                if (startCell != null && startCell != cell) {
+                    mazeCells[startCell.getRow()][startCell.getCol()].setState(CellState.EMPTY);
+                    gridButtons[startCell.getRow()][startCell.getCol()].setBackground(mazeCells[startCell.getRow()][startCell.getCol()].getColor());
+                }
                 startCell = cell;
-            } else if (endCell == null) {
-                cell.setState(CellState.END);
+            } else if (newState == CellState.END) {
+                if (endCell != null && endCell != cell) {
+                    mazeCells[endCell.getRow()][endCell.getCol()].setState(CellState.EMPTY);
+                    gridButtons[endCell.getRow()][endCell.getCol()].setBackground(mazeCells[endCell.getRow()][endCell.getCol()].getColor());
+                }
                 endCell = cell;
-            } else {
-                cell.setState(CellState.WALL);
-            }
-        } else {
-            if (cell.equals(startCell)) {
+            } else if (oldState == CellState.START && newState != CellState.START) {
                 startCell = null;
-            } else if (cell.equals(endCell)) {
+            } else if (oldState == CellState.END && newState != CellState.END) {
                 endCell = null;
             }
-            cell.setState(CellState.EMPTY);
+
+            cell.setState(newState);
+            gridButtons[row][col].setBackground(cell.getColor());
         }
-
-        actualizarVista();
     }
 
-    public void actualizarVista() {
-        Component[] components = getComponents();
-        for (int i = 0; i < components.length; i++) {
-            int row = i / cols;
-            int col = i % cols;
-            CellState state = maze[row][col].getState();
-            components[i].setBackground(obtenerColorEstado(state));
+    public Cell getCell(int row, int col) {
+        if (row >= 0 && row < mazeRow && col >= 0 && col < mazeCol) {
+            return mazeCells[row][col];
         }
-        repaint();
+        return null;
     }
-
-    private Color obtenerColorEstado(CellState state) {
-        return switch (state) {
-            case EMPTY -> Color.WHITE;
-            case WALL -> Color.BLACK;
-            case START -> Color.GREEN;
-            case END -> Color.RED;
-            case VISITED -> Color.YELLOW;
-            case PATH -> Color.CYAN;
-        };
-    }
-
-    public void limpiarCamino() {
-        for (Cell[] fila : maze) {
-            for (Cell celda : fila) {
-                if (celda.getState() == CellState.PATH || celda.getState() == CellState.VISITED) {
-                    celda.setState(CellState.EMPTY);
-                    celda.setVisited(false);
-                }
-            }
-        }
-        actualizarVista();
-    }
-
-    public void reiniciarMaze() {
-        this.startCell = null;
-        this.endCell = null;
-        inicializarMaze();
-    }
-
-    public void clearMaze() {
-        for (Cell[] fila : maze) {
-            for (Cell celda : fila) {
-                celda.setState(CellState.EMPTY);
-                celda.setVisited(false);
-            }
-        }
-        startCell = null;
-        endCell = null;
-        actualizarVista();
-    }
-
 
     public Cell[][] getMaze() {
-        return maze;
+        return mazeCells;
+    }
+
+    public JButton[][] getGridButtons() {
+        return gridButtons;
     }
 
     public Cell getStartCell() {
@@ -133,5 +86,13 @@ public class MazePanel extends JPanel {
 
     public Cell getEndCell() {
         return endCell;
+    }
+
+    public int getMazeRow() {
+        return mazeRow;
+    }
+
+    public int getMazeCol() {
+        return mazeCol;
     }
 }

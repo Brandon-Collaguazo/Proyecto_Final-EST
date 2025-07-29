@@ -12,36 +12,36 @@ import java.util.Set;
 
 public class MazeSolverRecursivoCompletoBT implements MazeSolver {
 
-    private List<Cell> path;
-    private Set<Cell> visited;
-    private Cell[][] grid;
-    private Cell end;
-
     public MazeSolverRecursivoCompletoBT() {
-        this.path = new ArrayList<>();
-        this.visited = new LinkedHashSet<>();
+
     }
 
     @Override
     public SolverResults solver(Cell[][] grid, Cell start, Cell end) {
-        path.clear();
-        visited.clear();
-        this.grid = grid;
-        this.end = end;
+        List<Cell> path = new ArrayList<>();
+        Set<Cell> visited = new LinkedHashSet<>();
 
         if (grid == null || grid.length == 0) {
-            return new SolverResults(new ArrayList<>(), new LinkedHashSet<>());
+            return new SolverResults(new ArrayList<>(), visited);
         }
 
-        if (findPath(start)) {
+        if (!isValidPosition(start.row, start.col, grid) || grid[start.row][start.col].getState() == CellState.WALL) {
+            return new SolverResults(new ArrayList<>(), visited);
+        }
+
+        if (findPath(grid, start, end, path, visited)) {
+            java.util.Collections.reverse(path);
             return new SolverResults(path, visited);
         }
 
-        return new SolverResults(new ArrayList<>(), new LinkedHashSet<>());
+        return new SolverResults(new ArrayList<>(), visited);
     }
 
-    private boolean findPath(Cell current) {
-        if (!isInMaze(current) || !isValid(current)) {
+    private boolean findPath(Cell[][] grid, Cell current, Cell end, List<Cell> path, Set<Cell> visited) {
+        int row = current.row;
+        int col = current.col;
+
+        if (!isValidPosition(row, col, grid) || grid[row][col].getState() == CellState.WALL || visited.contains(current)) {
             return false;
         }
 
@@ -52,26 +52,30 @@ public class MazeSolverRecursivoCompletoBT implements MazeSolver {
             return true;
         }
 
-        if (findPath(grid[current.row][current.col + 1]) ||
-                findPath(grid[current.row + 1][current.col]) ||
-                findPath(grid[current.row][current.col - 1]) ||
-                findPath(grid[current.row - 1][current.col])) {
-            return true;
+        int[][] directions = {
+                {0, 1},   // Derecha
+                {1, 0},   // Abajo
+                {-1, 0},  // Arriba
+                {0, -1}   // Izquierda
+        };
+
+        for (int[] dir : directions) {
+            int nextRow = row + dir[0];
+            int nextCol = col + dir[1];
+
+            if (isValidPosition(nextRow, nextCol, grid)) {
+                Cell nextCell = grid[nextRow][nextCol];
+                if (findPath(grid, nextCell, end, path, visited)) {
+                    return true;
+                }
+            }
         }
 
         path.remove(path.size() - 1);
         return false;
     }
 
-    private boolean isValid(Cell current) {
-        return current != null &&
-                current.getState() != CellState.WALL &&
-                !visited.contains(current);
-    }
-
-    private boolean isInMaze(Cell current) {
-        int fila = current.row;
-        int columna = current.col;
-        return fila >= 0 && fila < grid.length && columna >= 0 && columna < grid[0].length;
+    private boolean isValidPosition(int row, int col, Cell[][] grid) {
+        return row >= 0 && row < grid.length && col >= 0 && col < grid[0].length;
     }
 }

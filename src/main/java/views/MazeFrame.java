@@ -2,6 +2,7 @@ package views;
 
 import controllers.MazeController;
 import dao.imple.AlgorithmResultDAOFile;
+import models.Cell;
 import models.CellState;
 
 import javax.swing.*;
@@ -13,9 +14,11 @@ public class MazeFrame extends JFrame {
     private JMenuBar menuBar;
     private JMenu menuArchivo;
     private JMenu menuAyuda;
+    private JMenu menuSalir;
     private JMenuItem itemLaberinto;
     private JMenuItem itemResultados;
     private JMenuItem itemInfo;
+    private JMenuItem itemSalir;
 
     private JPanel pnlPrincipal;
     private JPanel pnlSup;
@@ -27,10 +30,10 @@ public class MazeFrame extends JFrame {
     private JToggleButton btnEnd;
     private JToggleButton btnWall;
 
-    private JComboBox cbxAlgoritmo;
+    private JComboBox<String> cbxAlgoritmo;
     private JButton btnSolve;
     private JButton btnStep;
-    private JButton btnClean;
+    private JToggleButton btnClean;
 
     private int mazeRow;
     private int mazeCol;
@@ -40,7 +43,7 @@ public class MazeFrame extends JFrame {
     public MazeFrame() {
         inputDimensions();
         initComponents();
-        mazeController = new MazeController(mazePanel, new AlgorithmResultDAOFile("resultado.txt"));
+        mazeController = new MazeController(mazePanel, new AlgorithmResultDAOFile("results.txt"));
         configurarListenerControlador();
     }
 
@@ -88,21 +91,26 @@ public class MazeFrame extends JFrame {
 
         menuArchivo = new JMenu("Archivo");
         menuAyuda = new JMenu("Ayuda");
+        menuSalir = new JMenu("Salir del programa");
 
         itemLaberinto = new JMenuItem("Nuevo laberinto");
         itemResultados = new JMenuItem("Ver resultados");
         itemInfo = new JMenuItem("Acerca de");
+        itemSalir = new JMenuItem("Salir");
 
         mazePanel = new MazePanel(mazeRow, mazeCol);
         pnlPrincipal.add(mazePanel, BorderLayout.CENTER);
 
         menuBar.add(menuArchivo);
         menuBar.add(menuAyuda);
+        menuBar.add(menuSalir);
 
         menuArchivo.add(itemLaberinto);
         menuArchivo.add(itemResultados);
 
         menuAyuda.add(itemInfo);
+
+        menuSalir.add(itemSalir);
 
         pnlPrincipal.add(pnlSup, BorderLayout.NORTH);
         pnlPrincipal.add(mazePanel, BorderLayout.CENTER);
@@ -112,6 +120,7 @@ public class MazeFrame extends JFrame {
         buttonGroup.add(btnStart);
         buttonGroup.add(btnEnd);
         buttonGroup.add(btnWall);
+        buttonGroup.add(btnClean);
 
         cargarCombo();
         configuraristeners();
@@ -129,31 +138,70 @@ public class MazeFrame extends JFrame {
         itemResultados.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ResultadosDialog resultsView = new ResultadosDialog(MazeFrame.this);
-                resultsView.setVisible(true);
+                mazeController.showResults();
             }
         });
 
-        JButton[][] cells = mazePanel.getGridCells();
+        itemInfo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String mensaje = "Proyecto realizado por: Andrés Cajas - Brandon Collaguazo :D\nMateria: Estructura de Datos - UPS";
+                JOptionPane.showMessageDialog(
+                        MazeFrame.this,
+                        mensaje,
+                        "Acerca de",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            }
+        });
+
+        itemSalir.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int respuesta = JOptionPane.showConfirmDialog(
+                        MazeFrame.this,
+                        "¿Está seguro que desea salir de la aplicación?",
+                        "Confirmar salida",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE
+                );
+
+                if (respuesta == JOptionPane.YES_NO_OPTION) {
+                    System.exit(0);
+                }
+
+            }
+        });
+
+        itemLaberinto.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                new MazeFrame();
+            }
+        });
+
+        JButton[][] buttons = mazePanel.getGridButtons();
         for (int i = 0; i < mazeRow; i++) {
             for (int j = 0; j < mazeCol; j++) {
-                JButton cell = cells[i][j];
-
-                cell.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if (!cell.getBackground().equals(CellState.MURO.getColor()) &&
-                        !cell.getBackground().equals(CellState.INICIO.getColor()) &&
-                        !cell.getBackground().equals(CellState.FIN.getColor()) &&
-                        !cell.getBackground().equals(CellState.LIBRE.getColor())) {
+                JButton cellButton = buttons[i][j];
+                final int row = i;
+                final int col = j;
+                cellButton.addActionListener(e -> {
+                    Cell clickedCell = mazePanel.getCell(row, col);
+                    if (btnStart.getModel().isSelected()) {
+                        mazePanel.updateCellState(row, col, CellState.START);
+                    } else if (btnEnd.getModel().isSelected()) {
+                        mazePanel.updateCellState(row, col, CellState.END);
+                    } else if (btnWall.getModel().isSelected()) {
+                        if (clickedCell.getState() == CellState.WALL) {
+                            mazePanel.updateCellState(row, col, CellState.EMPTY);
+                        } else if (clickedCell.getState() != CellState.START && clickedCell.getState() != CellState.END) {
+                            mazePanel.updateCellState(row, col, CellState.WALL);
                         }
-
-                        if (btnStart.getModel().isSelected()) {
-                            cell.setBackground(CellState.INICIO.getColor());
-                        } else if (btnEnd.getModel().isSelected()) {
-                            cell.setBackground(CellState.FIN.getColor());
-                        } else if (btnWall.getModel().isSelected()) {
-                            cell.setBackground(CellState.MURO.getColor());
+                    } else if (btnClean.getModel().isSelected()) {
+                        if (clickedCell.getState() != CellState.START && clickedCell.getState() != CellState.END) {
+                            mazePanel.updateCellState(row, col, CellState.EMPTY);
                         }
                     }
                 });
@@ -172,14 +220,7 @@ public class MazeFrame extends JFrame {
             }
         });
 
-        btnClean.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                mazeController.clearMaze();
-            }
-        });
 
-        configuraristeners();
     }
 
     private void cargarCombo() {
@@ -312,11 +353,11 @@ public class MazeFrame extends JFrame {
         this.btnStep = btnStep;
     }
 
-    public JButton getBtnClean() {
+    public JToggleButton getBtnClean() {
         return btnClean;
     }
 
-    public void setBtnClean(JButton btnClean) {
+    public void setBtnClean(JToggleButton btnClean) {
         this.btnClean = btnClean;
     }
 
