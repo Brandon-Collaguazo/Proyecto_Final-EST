@@ -5,12 +5,13 @@
 
 ### 📌 Información General
 - **Asignatura:** Estructura de Datos.
-- **Estudiantes:** Brandon Collaguazo, Carlos Cajas.
-- **Correos:** bcollaguazos@est.ups.edu.ec / ccajast@est.ups.edu.ec
+- **Estudiante1:** Brandon Collaguazo
+- **Correos:** bcollaguazos@est.ups.edu.ec 
+- **Estudiante2:** Carlos Cajas 
+- **Correos:** ccajast@est.ups.edu.ec
 - **Carrera:** Computación.
 - **Fecha:** 28/07/2025
 - **Profesor:** Pablo Torres
-
 ---
 
 ### 📄 Índice
