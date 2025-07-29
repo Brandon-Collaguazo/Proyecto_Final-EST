@@ -9,56 +9,117 @@ import java.util.*;
 
 public class MazeSolverRecursivo implements MazeSolver {
 
-    @Override
-    public SolverResults solver(Cell[][] grid, Cell start, Cell end) {
-        List<Cell> path = new ArrayList<>();
-        Set<Cell> visited = new LinkedHashSet<>();
-        if (grid == null || grid.length == 0) {
-            return new SolverResults(new ArrayList<>(), visited);
-        }
-        if (!isValidPosition(start.row, start.col, grid) || grid[start.row][start.col].getState() == CellState.WALL) {
-            return new SolverResults(new ArrayList<>(), visited);
-        }
-        if (findPath(grid, start, end, path, visited)) {
-            java.util.Collections.reverse(path);
-            return new SolverResults(path, visited);
-        }
-        return new SolverResults(new ArrayList<>(), visited);
-    }
+    private Cell[][] maze;
+    private Cell startCell;
+    private Cell endCell;
+    private Stack<Cell> stack;
+    private Set<Cell> visited;
+    private Map<Cell, Cell> parentMap;
+    private SolverResults currentSolverResults;
+    private boolean foundPath = false;
 
-    private boolean findPath(Cell[][] grid, Cell current, Cell end, List<Cell> path, Set<Cell> visited) {
-        int row = current.row;
-        int col = current.col;
-        if (!isValidPosition(row, col, grid) || grid[row][col].getState() == CellState.WALL || visited.contains(current)) {
-            return false;
-        }
-
-        visited.add(current);
-        if (current.equals(end)) {
-            path.add(current);
-            return true;
-        }
+    private List<Cell> getNeighbors(Cell cell) {
+        List<Cell> neighbors = new ArrayList<>();
+        int r = cell.getRow();
+        int c = cell.getCol();
 
         int[][] directions = {
-                {0, 1}, // Derecha
-                {1, 0}  // Abajo
+                {1, 0},
+                {0, 1}
         };
+
         for (int[] dir : directions) {
-            int nextRow = row + dir[0];
-            int nextCol = col + dir[1];
-            if (isValidPosition(nextRow, nextCol, grid)) {
-                Cell nextCell = grid[nextRow][nextCol];
-                if (findPath(grid, nextCell, end, path, visited)) {
-                    path.add(current);
-                    return true;
-                }
+            int nr = r + dir[0];
+            int nc = c + dir[1];
+
+            if (isValidPosition(nr, nc, maze) && maze[nr][nc].getState() != CellState.WALL) {
+                neighbors.add(maze[nr][nc]);
             }
         }
-
-        return false;
+        return neighbors;
     }
 
     private boolean isValidPosition(int row, int col, Cell[][] grid) {
         return row >= 0 && row < grid.length && col >= 0 && col < grid[0].length;
+    }
+
+    @Override
+    public void initialize(Cell[][] maze, Cell start, Cell end) {
+        this.maze = maze;
+        this.startCell = start;
+        this.endCell = end;
+        this.stack = new Stack<>();
+        this.visited = new HashSet<>();
+        this.parentMap = new HashMap<>();
+        this.currentSolverResults = new SolverResults();
+        this.foundPath = false;
+
+        stack.push(startCell);
+        visited.add(startCell);
+        currentSolverResults.addVisitedCell(startCell);
+    }
+
+    @Override
+    public boolean step() {
+        if (foundPath || stack.isEmpty()) {
+            return false;
+        }
+
+        Cell current = stack.pop();
+
+        if (current.equals(endCell)) {
+            foundPath = true;
+            reconstructPath();
+            return false;
+        }
+
+        List<Cell> neighbors = getNeighbors(current);
+
+        Collections.reverse(neighbors);
+
+        for (Cell neighbor : neighbors) {
+            if (!visited.contains(neighbor)) {
+                visited.add(neighbor);
+                parentMap.put(neighbor, current);
+                stack.push(neighbor);
+                currentSolverResults.addVisitedCell(neighbor);
+            }
+        }
+
+        return true;
+    }
+
+    private void reconstructPath() {
+        List<Cell> path = new ArrayList<>();
+        Cell current = endCell;
+        while (current != null) {
+            path.add(current);
+            if (current.equals(startCell)) break;
+            current = parentMap.get(current);
+        }
+        Collections.reverse(path);
+        currentSolverResults.setPath(path);
+    }
+
+    @Override
+    public SolverResults getCurrentResults() {
+        return currentSolverResults;
+    }
+
+    @Override
+    public void reset() {
+        if (stack != null) stack.clear();
+        if (visited != null) visited.clear();
+        if (parentMap != null) parentMap.clear();
+        this.currentSolverResults = new SolverResults();
+        this.foundPath = false;
+        this.maze = null;
+        this.startCell = null;
+        this.endCell = null;
+    }
+
+    @Override
+    public SolverResults getFinalPath() {
+        return currentSolverResults;
     }
 }

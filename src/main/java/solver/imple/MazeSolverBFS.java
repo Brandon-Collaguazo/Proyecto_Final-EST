@@ -7,7 +7,7 @@ import solver.MazeSolver;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.HashSet; // Cambiado a HashSet por eficiencia para 'visited'
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -15,52 +15,106 @@ import java.util.Set;
 
 public class MazeSolverBFS implements MazeSolver {
 
-    @Override
-    public SolverResults solver(Cell[][] grid, Cell start, Cell end) {
-        Set<Cell> visited = new LinkedHashSet<>();
-        List<Cell> emptyPath = new ArrayList<>();
-        if (grid == null || grid.length == 0 || start == null || end == null ||
-                start.getState() == CellState.WALL || end.getState() == CellState.WALL) {
-            return new SolverResults(emptyPath, visited);
-        }
+    private Cell[][] maze;
+    private Cell startCell;
+    private Cell endCell;
+    private Queue<Cell> queue;
+    private Set<Cell> visited;
+    private Map<Cell, Cell> parentMap;
+    private SolverResults currentSolverResults;
+    private boolean foundPath = false;
 
-        Queue<Cell> queue = new ArrayDeque<>();
-        Map<Cell, Cell> parentMap = new HashMap<>();
-        queue.add(start);
-        visited.add(start);
-        parentMap.put(start, null);
-        while (!queue.isEmpty()) {
-            Cell current = queue.poll();
+    private List<Cell> getNeighbors(Cell cell) {
+        List<Cell> neighbors = new ArrayList<>();
+        int r = cell.getRow();
+        int c = cell.getCol();
+        int[] dr = {-1, 1, 0, 0};
+        int[] dc = {0, 0, 1, -1};
 
-            if (current.equals(end)) {
-                return new SolverResults(buildPath(parentMap, end), visited);
-            }
+        for (int i = 0; i < 4; i++) {
+            int nr = r + dr[i];
+            int nc = c + dc[i];
 
-            int[][] directions = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
-            for (int[] dir : directions) {
-                int newRow = current.row + dir[0];
-                int newCol = current.col + dir[1];
-
-                if (newRow < 0 || newRow >= grid.length || newCol < 0 || newCol >= grid[0].length) {
-                    continue;
-                }
-                Cell neighbor = grid[newRow][newCol];
-
-                if (neighbor.getState() != CellState.WALL && !visited.contains(neighbor)) {
-                    visited.add(neighbor);
-                    parentMap.put(neighbor, current);
-                    queue.add(neighbor);
-                }
+            if (nr >= 0 && nr < maze.length && nc >= 0 && nc < maze[0].length &&
+                    maze[nr][nc].getState() != CellState.WALL) {
+                neighbors.add(maze[nr][nc]);
             }
         }
-        return new SolverResults(emptyPath, visited);
+        return neighbors;
     }
 
-    private List<Cell> buildPath(Map<Cell, Cell> parentMap, Cell end) {
-        List<Cell> path = new ArrayList<>();
-        for (Cell at = end; at != null; at = parentMap.get(at)) {
-            path.add(0, at);
+    @Override
+    public void initialize(Cell[][] maze, Cell start, Cell end) {
+        this.maze = maze;
+        this.startCell = start;
+        this.endCell = end;
+        this.queue = new ArrayDeque<>();
+        this.visited = new HashSet<>();
+        this.parentMap = new HashMap<>();
+        this.currentSolverResults = new SolverResults();
+        this.foundPath = false;
+
+        queue.offer(startCell);
+        visited.add(startCell);
+        currentSolverResults.addVisitedCell(startCell);
+        parentMap.put(startCell, null);
+    }
+
+    @Override
+    public boolean step() {
+        if (foundPath || queue.isEmpty()) {
+            return false;
         }
-        return path;
+
+        Cell current = queue.poll();
+
+        if (current.equals(endCell)) {
+            foundPath = true;
+            reconstructPath();
+            return false;
+        }
+
+        for (Cell neighbor : getNeighbors(current)) {
+            if (!visited.contains(neighbor)) {
+                visited.add(neighbor);
+                parentMap.put(neighbor, current);
+                queue.offer(neighbor);
+                currentSolverResults.addVisitedCell(neighbor);
+            }
+        }
+        return true;
+    }
+
+    private void reconstructPath() {
+        List<Cell> path = new ArrayList<>();
+        Cell current = endCell;
+        while (current != null) {
+            path.add(0, current);
+            if (current.equals(startCell)) break;
+            current = parentMap.get(current);
+        }
+        currentSolverResults.setPath(path);
+    }
+
+    @Override
+    public SolverResults getCurrentResults() {
+        return currentSolverResults;
+    }
+
+    @Override
+    public void reset() {
+        if (queue != null) queue.clear();
+        if (visited != null) visited.clear();
+        if (parentMap != null) parentMap.clear();
+        this.currentSolverResults = new SolverResults();
+        this.foundPath = false;
+        this.maze = null;
+        this.startCell = null;
+        this.endCell = null;
+    }
+
+    @Override
+    public SolverResults getFinalPath() {
+        return currentSolverResults;
     }
 }

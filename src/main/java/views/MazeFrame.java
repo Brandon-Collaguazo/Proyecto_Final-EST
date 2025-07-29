@@ -101,6 +101,7 @@ public class MazeFrame extends JFrame {
         mazePanel = new MazePanel(mazeRow, mazeCol);
         pnlPrincipal.add(mazePanel, BorderLayout.CENTER);
 
+
         menuBar.add(menuArchivo);
         menuBar.add(menuAyuda);
         menuBar.add(menuSalir);
@@ -215,12 +216,28 @@ public class MazeFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String itemSelected = (String) cbxAlgoritmo.getSelectedItem();
                 if (itemSelected != null) {
-                    mazeController.solverMaze(itemSelected);
+                    mazeController.startAutomaticSolving(itemSelected);
                 }
             }
         });
 
-
+        btnStep.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (mazeController.isSolving() && mazeController.isStepByStepMode()) {
+                    mazeController.performOneStep();
+                } else if (!mazeController.isSolving()) {
+                    String itemSelected = (String) cbxAlgoritmo.getSelectedItem();
+                    if (itemSelected != null) {
+                        mazeController.startStepByStepMode(itemSelected);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(MazeFrame.this,
+                            "La resolución automática está en curso. Deténgala para usar el modo paso a paso.",
+                            "Advertencia", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        });
     }
 
     private void cargarCombo() {

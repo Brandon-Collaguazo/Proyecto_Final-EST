@@ -65,6 +65,28 @@ public class MazePanel extends JPanel {
         }
     }
 
+    public void reinitializeGrid(int newMazeRow, int newMazeCol) {
+        this.mazeRow = newMazeRow;
+        this.mazeCol = newMazeCol;
+        this.removeAll();
+        setLayout(new GridLayout(this.mazeRow, this.mazeCol));
+        initGrid();
+        startCell = null;
+        endCell = null;
+        revalidate(); // Valida el nuevo layout
+        repaint();    // Repinta el componente
+    }
+
+    public void resetMazeColors() {
+        for (int i = 0; i < mazeRow; i++) {
+            for (int j = 0; j < mazeCol; j++) {
+                Cell cell = mazeCells[i][j];
+                gridButtons[i][j].setBackground(cell.getColor());
+            }
+        }
+        repaint(); // Asegura el repintado de todo el panel
+    }
+
     public Cell getCell(int row, int col) {
         if (row >= 0 && row < mazeRow && col >= 0 && col < mazeCol) {
             return mazeCells[row][col];

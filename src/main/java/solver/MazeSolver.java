@@ -4,7 +4,9 @@ import models.Cell;
 import models.SolverResults;
 
 public interface MazeSolver {
-
-    SolverResults solver(Cell[][] grid, Cell start, Cell end);
-
+    void initialize(Cell[][] maze, Cell start, Cell end);
+    boolean step();
+    SolverResults getCurrentResults();
+    void reset();
+    SolverResults getFinalPath();
 }
