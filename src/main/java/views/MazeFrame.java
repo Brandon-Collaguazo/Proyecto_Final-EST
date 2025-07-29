@@ -181,6 +181,13 @@ public class MazeFrame extends JFrame {
                 new MazeFrame();
             }
         });
+        btnClean.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mazePanel.limpiarCamino();
+                mazePanel.repaint();
+            }
+        });
 
         JButton[][] buttons = mazePanel.getGridButtons();
         for (int i = 0; i < mazeRow; i++) {
@@ -220,6 +227,21 @@ public class MazeFrame extends JFrame {
                 }
             }
         });
+        btnStep.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String tipo = (String) cbxAlgoritmo.getSelectedItem();
+                if (mazeController != null) {
+                    if (mazeController.getPasoIndex() == 0) {
+                        mazeController.prepararPasoAPaso(tipo);
+                    }
+                    mazeController.siguientePaso();
+                }
+            }
+        });
+
+
+
 
         btnStep.addActionListener(new ActionListener() {
             @Override
