@@ -36,6 +36,7 @@ public class MazeSolverDFS implements MazeSolver {
         return new SolverResults(new ArrayList<>(), visited);
     }
 
+
     private boolean dfs(Cell current) {
         if (current.row < 0 || current.row >= grid.length ||
                 current.col < 0 || current.col >= grid[0].length) {

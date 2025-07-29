@@ -19,6 +19,10 @@ public class MazeController {
 
     private final MazePanel mazePanel;
     private final AlgorithmResultDAO dao;
+    private List<Cell> pasosActuales;
+    private Set<Cell> visitadosActuales;
+    private int pasoIndex;
+
 
     public MazeController(MazePanel mazePanel, AlgorithmResultDAO dao) {
         this.mazePanel = mazePanel;
@@ -59,7 +63,7 @@ public class MazeController {
             return null;
         }
 
-        // Marcar celdas visitadas y el camino
+
         marcarVisitados(exito.getVisited());
         marcarCamino(exito.getPath());
 
@@ -115,6 +119,44 @@ public class MazeController {
             }
         }
     }
+    public void prepararPasoAPaso(String tipoAlgoritmo) {
+        Cell[][] laberinto = mazePanel.getMaze();
+        Cell inicio = mazePanel.getStartCell();
+        Cell fin = mazePanel.getEndCell();
+
+        if (inicio == null || fin == null) {
+            JOptionPane.showMessageDialog(null, "Selecciona inicio y fin.");
+            return;
+        }
+
+        MazeSolver solver = obtenerAlgoritmo(tipoAlgoritmo);
+        if (solver == null) return;
+
+        limpiarCeldas(laberinto);
+        mazePanel.repaint();
+
+        SolverResults resultado = solver.solver(laberinto, inicio, fin);
+
+        this.pasosActuales = resultado.getPath();
+        this.visitadosActuales = resultado.getVisited();
+        this.pasoIndex = 0;
+    }
+
+    public void siguientePaso() {
+        if (pasosActuales == null || pasoIndex >= pasosActuales.size()) {
+            JOptionPane.showMessageDialog(null, "No hay más pasos.");
+            return;
+        }
+
+        Cell paso = pasosActuales.get(pasoIndex);
+        if (paso.getState() == CellState.EMPTY || paso.getState() == CellState.VISITED) {
+            mazePanel.updateCellState(paso.getRow(), paso.getCol(), CellState.PATH);
+        }
+        pasoIndex++;
+        mazePanel.repaint();
+    }
+
+
 
     private void marcarCamino(List<Cell> path) {
         if (path == null) return;
@@ -132,4 +174,8 @@ public class MazeController {
             mazePanel.updateCellState(fin.getRow(), fin.getCol(), CellState.END);
         }
     }
+    public int getPasoIndex() {
+        return pasoIndex;
+    }
+
 }
