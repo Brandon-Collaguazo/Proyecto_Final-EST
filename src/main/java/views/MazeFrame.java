@@ -43,8 +43,9 @@ public class MazeFrame extends JFrame {
     public MazeFrame() {
         inputDimensions();
         initComponents();
+        // Inicializar el controlador después de que los componentes estén listos
         mazeController = new MazeController(mazePanel, new AlgorithmResultDAOFile("results.txt"));
-        configurarListenerControlador();
+        configurarListenerControlador(); // Configurar listeners que dependen del controlador
     }
 
     private void inputDimensions() {
@@ -124,7 +125,7 @@ public class MazeFrame extends JFrame {
         buttonGroup.add(btnClean);
 
         cargarCombo();
-        configuraristeners();
+        configuraristeners(); // Configurar listeners generales
 
         setJMenuBar(menuBar);
         setContentPane(pnlPrincipal);
@@ -178,13 +179,14 @@ public class MazeFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                new MazeFrame();
+                new MazeFrame(); // Crea una nueva instancia de MazeFrame
             }
         });
+
         btnClean.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mazePanel.limpiarCamino();
+                mazePanel.limpiarCamino(); // Limpia el camino y los puntos de inicio/fin
                 mazePanel.repaint();
             }
         });
@@ -227,21 +229,6 @@ public class MazeFrame extends JFrame {
                 }
             }
         });
-        btnStep.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String tipo = (String) cbxAlgoritmo.getSelectedItem();
-                if (mazeController != null) {
-                    if (mazeController.getPasoIndex() == 0) {
-                        mazeController.prepararPasoAPaso(tipo);
-                    }
-                    mazeController.siguientePaso();
-                }
-            }
-        });
-
-
-
 
         btnStep.addActionListener(new ActionListener() {
             @Override
@@ -272,6 +259,7 @@ public class MazeFrame extends JFrame {
         cbxAlgoritmo.setSelectedIndex(0);
     }
 
+    // Getters y Setters (mantener los existentes)
     public JMenu getMenuArchivo() {
         return menuArchivo;
     }

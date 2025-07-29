@@ -3,109 +3,88 @@ package dao.imple;
 import dao.AlgorithmResultDAO;
 import models.AlgorithmResult;
 
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AlgorithmResultDAOFile implements AlgorithmResultDAO {
 
-    private String rutaArchivo;
+    private final String rutaArchivo;
 
     public AlgorithmResultDAOFile(String rutaArchivo) {
         this.rutaArchivo = rutaArchivo;
+        System.out.println("DAO File inicializado. Ruta: " + new File(rutaArchivo).getAbsolutePath());
+        inicializarArchivo();
     }
 
-    @Override
-    public void guardarResultado(AlgorithmResult resultado) {
-        List<AlgorithmResult> exist = obtenerTodos();
-        boolean actualizado =false;
-
-        for( int i = 0;i<exist.size();i++){
-            AlgorithmResult resultadoAux=exist.get(i);
-            if(resultadoAux.getNameAlgorithm().equalsIgnoreCase(resultado.getNameAlgorithm())){
-                exist.set(i,resultado);
-                actualizado= true;
-                break;
-            }
-        }
-        if(!actualizado){
-            exist.add(resultado);
-        }
-
-        try(PrintWriter writer = new PrintWriter(new FileWriter(rutaArchivo))){
-            for(AlgorithmResult resultadoAux:exist){
-                writer.println(resultadoAux.toString());
-            }
-        }catch(IOException e){
-            System.err.println("Error al guardar el resultado : "+ e.getMessage());
-
-        }
-
-    }
-
-    @Override
-    public List<AlgorithmResult> obtenerTodos() {
-        List<AlgorithmResult> list = new ArrayList<>();
+    private void inicializarArchivo() {
         File archivo = new File(rutaArchivo);
-        if (!archivo.exists())
-            return list;
+        if (!archivo.exists()) {
+            try (PrintWriter writer = new PrintWriter(new FileWriter(rutaArchivo, false))) {
+                writer.println("Algoritmo;Pasos;Tiempo(ms)"); // Encabezado de 3 campos
+                System.out.println("Archivo de resultados creado con encabezado en: " + archivo.getAbsolutePath());
+            } catch (IOException e) {
+                System.err.println("Error al inicializar el archivo: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(archivo))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 3) {
-                    String nombre = parts[0].trim();
-                    String pasosStr = parts[1].trim();
-                    int pasos = 0;
-                    if (pasosStr.startsWith("pasos=")) {
-                        try {
-                            pasos = Integer.parseInt(pasosStr.substring("pasos=".length()));
-                        } catch (NumberFormatException e) {
-                            System.err.println("Error de formato en pasos: " + pasosStr);
-                        }
-                    } else {
-                        try {
-                            pasos = Integer.parseInt(pasosStr);
-                        } catch (NumberFormatException e) {
-                            System.err.println("Formato de pasos inesperado: " + pasosStr);
-                        }
+    @Override
+    public void guardar(AlgorithmResult resultado) throws IOException {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(rutaArchivo, true))) {
+            writer.println(resultado.toString());
+            System.out.println("Resultado guardado: " + resultado.getNameAlgorithm() + " en: " + new File(rutaArchivo).getAbsolutePath());
+        } catch (IOException e) {
+            System.err.println("Error al guardar el resultado: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @Override
+    public List<AlgorithmResult> listar() throws IOException {
+        List<AlgorithmResult> resultados = new ArrayList<>();
+        File archivo = new File(rutaArchivo);
+        if (!archivo.exists()) {
+            System.out.println("El archivo de resultados no existe en: " + archivo.getAbsolutePath() + ". Se devuelve lista vacía.");
+            return resultados;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(rutaArchivo))) {
+            String linea;
+            reader.readLine();
+            System.out.println("Leyendo resultados desde: " + archivo.getAbsolutePath());
+            while ((linea = reader.readLine()) != null) {
+                String[] partes = linea.split(";");
+                if (partes.length == 3) {
+                    try {
+                        String nombre = partes[0].trim();
+                        int pasos = Integer.parseInt(partes[1].trim());
+                        long tiempo = Long.parseLong(partes[2].trim());
+                        // Ya no se intenta parsear la fecha
+                        resultados.add(new AlgorithmResult(nombre, pasos, tiempo));
+                    } catch (NumberFormatException e) {
+                        System.err.println("Error de formato numérico en línea: '" + linea + "': " + e.getMessage());
                     }
-
-                    String tiempoStr = parts[2].trim();
-                    long tiempo = 0;
-                    if (tiempoStr.startsWith("tiempo=")) {
-                        try {
-                            tiempo = Long.parseLong(tiempoStr.substring("tiempo=".length()));
-                        } catch (NumberFormatException e) {
-                            System.err.println("Error de formato en tiempo: " + tiempoStr);
-                        }
-                    } else {
-                        try {
-                            tiempo = Long.parseLong(tiempoStr);
-                        } catch (NumberFormatException e) {
-                            System.err.println("Formato de tiempo inesperado: " + tiempoStr);
-                        }
-                    }
-
-                    list.add(new AlgorithmResult(nombre, pasos, tiempo));
+                } else {
+                    System.err.println("Línea con formato inesperado (se esperaban 3 partes separadas por ';'): '" + linea + "'");
                 }
             }
+            System.out.println("Se leyeron " + resultados.size() + " resultados.");
         } catch (IOException e) {
-            System.err.println("Error al leer el archivo : " + e.getMessage());
+            System.err.println("Error al listar resultados: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
-
-        return list;
+        return resultados;
     }
 
     @Override
-    public void eliminarTodos() {
-        try(PrintWriter writer = new PrintWriter(new FileWriter(rutaArchivo))){
-            writer.println("");
-
-        }catch(IOException e){
-            System.err.println("Error al eliminar el resultado : "+ e.getMessage());
+    public void eliminarTodos() throws IOException {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(rutaArchivo))) {
+            writer.println("Algoritmo;Pasos;Tiempo(ms)");
+            System.out.println("Resultados eliminados del archivo");
         }
     }
 }

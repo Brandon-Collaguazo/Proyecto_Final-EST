@@ -41,17 +41,14 @@ public class MazePanel extends JPanel {
         for (int i = 0; i < mazeRow; i++) {
             for (int j = 0; j < mazeCol; j++) {
                 Cell cell = mazeCells[i][j];
-                cell.setState(CellState.EMPTY);         // borra todo tipo de estado
-                cell.setVisited(false);                 // desmarca como visitado
+                cell.setState(CellState.EMPTY);
+                cell.setVisited(false);
                 gridButtons[i][j].setBackground(cell.getColor());
             }
         }
         startCell = null;
         endCell = null;
     }
-
-
-
 
     public void updateCellState(int row, int col, CellState newState) {
         if (row >= 0 && row < mazeRow && col >= 0 && col < mazeCol) {

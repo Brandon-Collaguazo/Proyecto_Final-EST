@@ -28,10 +28,10 @@ public class MazeSolverRecursivoCompletoBT implements MazeSolver {
         int c = cell.getCol();
 
         int[][] directions = {
-                {0, 1},   // Derecha
-                {1, 0},   // Abajo
                 {-1, 0},  // Arriba
-                {0, -1}   // Izquierda
+                {0, -1},  // Izquierda
+                {1, 0},   // Abajo
+                {0, 1}    // Derecha
         };
 
         for (int[] dir : directions) {
@@ -70,28 +70,27 @@ public class MazeSolverRecursivoCompletoBT implements MazeSolver {
         if (foundPath || stack.isEmpty()) {
             return false;
         }
-
-        Cell current = stack.pop();
-
+        Cell current = stack.peek();
         if (current.equals(endCell)) {
             foundPath = true;
             reconstructPath();
             return false;
         }
-
         List<Cell> neighbors = getNeighbors(current);
-
-        Collections.reverse(neighbors);
-
+        boolean hasUnvisited = false;
         for (Cell neighbor : neighbors) {
             if (!visited.contains(neighbor)) {
                 visited.add(neighbor);
                 parentMap.put(neighbor, current);
                 stack.push(neighbor);
                 currentSolverResults.addVisitedCell(neighbor);
+                hasUnvisited = true;
+                break;
             }
         }
-
+        if (!hasUnvisited) {
+            stack.pop();
+        }
         return true;
     }
 

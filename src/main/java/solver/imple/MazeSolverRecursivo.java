@@ -18,14 +18,21 @@ public class MazeSolverRecursivo implements MazeSolver {
     private SolverResults currentSolverResults;
     private boolean foundPath = false;
 
+    public MazeSolverRecursivo() {
+        this.stack = new Stack<>();
+        this.visited = new HashSet<>();
+        this.parentMap = new HashMap<>();
+        this.currentSolverResults = new SolverResults();
+    }
+
     private List<Cell> getNeighbors(Cell cell) {
         List<Cell> neighbors = new ArrayList<>();
         int r = cell.getRow();
         int c = cell.getCol();
 
         int[][] directions = {
-                {1, 0},
-                {0, 1}
+                {1, 0}, // Abajo
+                {0, 1}  // Derecha
         };
 
         for (int[] dir : directions) {
@@ -48,15 +55,16 @@ public class MazeSolverRecursivo implements MazeSolver {
         this.maze = maze;
         this.startCell = start;
         this.endCell = end;
-        this.stack = new Stack<>();
-        this.visited = new HashSet<>();
-        this.parentMap = new HashMap<>();
+
+        this.stack.clear();
+        this.visited.clear();
+        this.parentMap.clear();
         this.currentSolverResults = new SolverResults();
         this.foundPath = false;
 
-        stack.push(startCell);
-        visited.add(startCell);
-        currentSolverResults.addVisitedCell(startCell);
+        stack.push(start);
+        visited.add(start);
+        currentSolverResults.addVisitedCell(start);
     }
 
     @Override
@@ -66,7 +74,6 @@ public class MazeSolverRecursivo implements MazeSolver {
         }
 
         Cell current = stack.pop();
-
         if (current.equals(endCell)) {
             foundPath = true;
             reconstructPath();
@@ -74,15 +81,15 @@ public class MazeSolverRecursivo implements MazeSolver {
         }
 
         List<Cell> neighbors = getNeighbors(current);
-
         Collections.reverse(neighbors);
 
         for (Cell neighbor : neighbors) {
-            if (!visited.contains(neighbor)) {
+            if (!visited.contains(neighbor) && neighbor.getState() != CellState.WALL) {
                 visited.add(neighbor);
                 parentMap.put(neighbor, current);
                 stack.push(neighbor);
                 currentSolverResults.addVisitedCell(neighbor);
+                System.out.println("Reportando celda visitada: (" + neighbor.getRow() + ", " + neighbor.getCol() + ") - Total de celdas visitadas en results: " + currentSolverResults.getVisitedCells().size());
             }
         }
 
@@ -113,9 +120,6 @@ public class MazeSolverRecursivo implements MazeSolver {
         if (parentMap != null) parentMap.clear();
         this.currentSolverResults = new SolverResults();
         this.foundPath = false;
-        this.maze = null;
-        this.startCell = null;
-        this.endCell = null;
     }
 
     @Override

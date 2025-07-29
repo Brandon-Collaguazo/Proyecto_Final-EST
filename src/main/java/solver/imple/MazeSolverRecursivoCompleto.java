@@ -26,8 +26,8 @@ public class MazeSolverRecursivoCompleto implements MazeSolver {
         int[][] directions = {
                 {0, 1},   // Derecha
                 {1, 0},   // Abajo
-                {-1, 0},  // Arriba
-                {0, -1}   // Izquierda
+                {0, -1},  // Izquierda
+                {-1, 0}   // Arriba
         };
 
         for (int[] dir : directions) {

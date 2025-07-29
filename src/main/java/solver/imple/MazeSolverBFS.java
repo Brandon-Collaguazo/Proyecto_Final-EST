@@ -28,13 +28,11 @@ public class MazeSolverBFS implements MazeSolver {
         List<Cell> neighbors = new ArrayList<>();
         int r = cell.getRow();
         int c = cell.getCol();
-        int[] dr = {-1, 1, 0, 0};
-        int[] dc = {0, 0, 1, -1};
-
+        int[] dr = {-1, 1, 0, 0}; // Arriba, Abajo
+        int[] dc = {0, 0, -1, 1}; // Izquierda, Derecha
         for (int i = 0; i < 4; i++) {
             int nr = r + dr[i];
             int nc = c + dc[i];
-
             if (nr >= 0 && nr < maze.length && nc >= 0 && nc < maze[0].length &&
                     maze[nr][nc].getState() != CellState.WALL) {
                 neighbors.add(maze[nr][nc]);

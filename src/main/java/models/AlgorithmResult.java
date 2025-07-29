@@ -37,6 +37,6 @@ public class AlgorithmResult {
 
     @Override
     public String toString() {
-        return nameAlgorithm + "," + steps + "," + timeMs;
+        return nameAlgorithm + ";" + steps + ";" + timeMs;
     }
 }
